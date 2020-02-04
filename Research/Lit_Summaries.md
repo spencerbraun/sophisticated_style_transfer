@@ -66,5 +66,27 @@
 * The Parallel Wikipedia Simplification (PWKP) corpus prepared by Zhu et al. (2010), has become the benchmark dataset for training and evaluating automatic text simplification systems. However, we will show that this dataset is deficient and should be considered obsolete. 1) It is prone to automatic sentence alignment errors; 2) It contains a large proportion of inadequate simplifications; 3) It generalizes poorly to other text genres.
 * Newsela: Each article has been re-written 4 times for children at different grade levels by editors at Newsela2, a company that produces reading materials for pre-college classroom use. We use Simp-4 to denote the most simplified level and Simp-1 to denote the least simplified level.It is motivated by the Common Core Standards (Porter et al., 2011) in the United States. All the Newsela articles are grounded in the Lexile3 readability score, which is widely used to measure text complexity and assess students’ reading ability
 
+### Neural Style Transfer for Non-Parallel Text
+
+* https://github.com/vinitra/neural-text-style-transfer/blob/master/reports/Neural_Style_Transfer_for_Non_Parallel_Text.pdf
+* Draws heavily on MIT CSAIL’s Style Transfer from Non-Parallel Text by Cross Alignment: https://arxiv.org/pdf/1705.09655.pdf. Another paper to check out
+* They build on this work by trying to copy exact authorship style and propose new evaluation metrics
+* CSAIL took discriminator NN that tries to predict  the sentence style the data came from  - train autoencoder generator to minimize content loss while maximizing error of the discriminator to strip sentence of identifiable style
+* Then add in third decoder RNN to output the content in the target style.
+* Collected 1M tweets from celebrities and high profile accounts, cut down to 10 accounts with strong authorship style
+* Architecture - RNN GRU to find content latent variable, one layer FF NN to be discriminator, duplicate encoder to act as decoder to learn content representation. Then optimize decoder to output target style.
+* Used author classifier to determine success of style transfer. For content presertation send the sentence round trip twice to see how close original and reconverted sentence are  - BLEU score on those sentences.
+
+### Neural Text Style Transfer via Denoising and Reranking
+
+* https://www.aclweb.org/anthology/W19-2309.pdf
+* Note Andrew Ng is a coauthor, so I suppose we can ask him questions need be.
+* Frames style transfer as denois-ing: we synthesize a noisy corpus and treat the source style as a noisy version of the target style.
+* Start with non-parallel data in different styles, then synthesize parallel data using backtranslation. Produce noise in a way that should mimic the styles of the opposite text
+* With the parallel corpus, train a denoising NN between noisy and clean data - prepend each sentence with a token denoting its style. Train the model using both sets of noised / clean data - target and source styles.
+* Use a transformer encoder-decoder with byte-pair encoding. 
+* Evaluation: We define transfer strength as the ratio of target-domain to source-domain shift in sentence probability. Content - use cosine similarity. Fluency - We use th eaverage log probability of the sentence post-transfer with respect to a language model trained on CommonCrawl as our measure of fluency.
+* Our method relies on an initial seed corpus of(clean, noisy)sentence pairs to bootstrap training.  However, such a corpus is not ideal for the style transfer tasks we consider, as there is mismatch in many cases between the style transfer domains (e.g.news, music lyrics, forum posts) and the seed corpus (language learner posts).
+
 
 
