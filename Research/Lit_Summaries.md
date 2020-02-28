@@ -48,10 +48,10 @@
 * Continue with a content specific loss, while the overall cost function comprises several terms: the reconstruction objective, the multi-task objectives for style and content, and the adversarial objectives for style and content with hyperparameters to balance their weightings.
 
 #### Data
-* Ran model on Yelp and Amazon reviews, which come with sentiment labels - used to train the latent space and to evaluate sentiment transfer. Used Adam for autoencoder and RMSProp for discriminators. 
+* Ran model on Yelp and Amazon reviews, which come with sentiment labels - used to train the latent space and to evaluate sentiment transfer. Used Adam for autoencoder and RMSProp for discriminators.
 
 #### Conclusion
-* Metrics: Style transfer - trained a separate CNN to predict sentiment, then used that classifier as the truth for the style transfer. Content - cosine similarity, word overlap, KL smoothed language model, manual eval. 
+* Metrics: Style transfer - trained a separate CNN to predict sentiment, then used that classifier as the truth for the style transfer. Content - cosine similarity, word overlap, KL smoothed language model, manual eval.
 
 ***
 
@@ -71,20 +71,20 @@
 #### Models
 * We explore two models for text style transfer, to approach the aforementioned problems of 1) lacking parallel training data and 2) hard to separate the style from the content.
     1. The first model implements a __multi-decoder seq2seq__ where the encoder is used to capture the content c of the input X, and the multi-decoder contains n(n ≥ 2) decoders to generate outputs in different styles.
-        * The multi-decoder model for style transfer is similar to an auto-encoder with several decoders 
-        * Exception that the encoder now tries to learn some content representations that do not reflect styles 
+        * The multi-decoder model for style transfer is similar to an auto-encoder with several decoders
+        * Exception that the encoder now tries to learn some content representations that do not reflect styles
         * The style specific decoders (one for each style) then take the content representations and generate texts in different styles.
     
     2. The second model uses the same encoding strategy, but introduces __style embeddings that are jointly trained__ with the model. The style embeddings are used to augment the encoded representations, so that only one decoder needs to be learned to generate outputs in different styles.
-        * Our second model uses style embeddings to control the generated styles. 
+        * Our second model uses style embeddings to control the generated styles.
         * The encoder and the adversarial network parts are the same as the multi-decoder model, to generate content representations.  
         * A single decoder is trained in this model, which takes the concatenation of the content representation c and the style embedding e of a sentence as the input to generate texts in different styles.
     
 #### Auto-encoder model
-* In auto-encoder seq2seq model, both the encoder and decoder are recurrent neural networks (RNNs). We employ the gated recurrent unit (GRU) variant which uses gates to control the information flow. 
+* In auto-encoder seq2seq model, both the encoder and decoder are recurrent neural networks (RNNs). We employ the gated recurrent unit (GRU) variant which uses gates to control the information flow.
 
 #### Evaluation and overhead
-* Evaluation: transfer strength - We use a LSTM-sigmoid classifier which performs well in big data, evaluating sentiment using a binaruy classifier. Content preservation - cosine distance, for word embeddings used pre-trained Glove 
+* Evaluation: transfer strength - We use a LSTM-sigmoid classifier which performs well in big data, evaluating sentiment using a binaruy classifier. Content preservation - cosine distance, for word embeddings used pre-trained Glove
 * Performed some preprocessing to cut down on difficult data, used paper news title dataset and pos/neg review dataset.
 
 ***
@@ -94,21 +94,21 @@
 * _Source_ : https://www.aclweb.org/anthology/P11-1020.pdf
 
 #### Framework
-1. First, we describe a framework for easily and inexpensively crowdsourcing arbitrarily large training and test sets of independent, redundant linguistic descriptions of the same semantic content. 
+1. First, we describe a framework for easily and inexpensively crowdsourcing arbitrarily large training and test sets of independent, redundant linguistic descriptions of the same semantic content.
 2. Second, we define a new evaluation metric, PINC (Paraphrase In N-gram Changes), that relies on simple BLEU-like n-gram comparisons to measure the degree of novelty of automatically generated paraphrases.
-* Used Mech. Turk to collect summaries of videos etc. 
+* Used Mech. Turk to collect summaries of videos etc.
 
 #### Conclusion
 * Paper more useful for eval metrics - all three scores are combined using a support vector machine (SVM) trained on human ratings of paraphrase pairs.  
-* PEM, which uses a second language as pivot to establish semantic equivalence. To measure semantic equivalence, we simply use BLEU with multiple references. 
-* PINC that measures how many n-grams differ between the two sentences. 
+* PEM, which uses a second language as pivot to establish semantic equivalence. To measure semantic equivalence, we simply use BLEU with multiple references.
+* PINC that measures how many n-grams differ between the two sentences.
 * In essence, it is the inverse of BLEU since we want to minimize the number of n-gram overlaps between the two sentences.
 
 ***
 
 ### Shakespearizing Modern Language
 
-* _Source_ : https://www.aclweb.org/anthology/W17-4902.pdf. 
+* _Source_ : https://www.aclweb.org/anthology/W17-4902.pdf.
 * _Code_ : https://github.com/harsh19/Shakespearizing-Modern-English
 
 #### Method
@@ -116,26 +116,26 @@
 * Our dataset is a collection of line-by-line modern paraphrases for 16 of Shakespeare’s 36 plays (*Antony & Cleopatra*, *As You Like It*, *Comedy of Errors*, *Hamlet*, *Henry V* etc) from the educational site *Sparknotes*
 
 #### Model
-* We use a _bidirectional LSTM_ to encode the input modern English sentence. 
-* Our decoder side model is a mixture model of RNN module amd pointer network module. 
+* We use a _bidirectional LSTM_ to encode the input modern English sentence.
+* Our decoder side model is a mixture model of RNN module amd pointer network module.
 * The decoder RNN predicts probability distribution of next word over the vocabulary, while pointer model predicts probability distribution over words in input.
 
 #### Comparison
-* Each token in vocabulary is represented by a M dimensional embedding vector. 
+* Each token in vocabulary is represented by a M dimensional embedding vector.
     * Note that we do not directly use off-the-shelf pretrained embeddings such as *Glove* (Pennington et al., 2014) and *Word2Vec* (Mikolov et al., 2013) since we need to learn embeddings for novel word forms
 * A pair of corresponding *Original* and *Modern* sentences have significant vocabulary overlap.
-    * Moreover, there are lot of proper nouns and rare words which might not be predicted by a sequence to sequence model. 
+    * Moreover, there are lot of proper nouns and rare words which might not be predicted by a sequence to sequence model.
     * To rectify this, pointer networks have been used to enable copying of tokens from input directly
     
 #### Training
-* Cross entropy loss is used to train the model. 
-* Sentinel Loss (SL): Following from work by (Merity et al., 2016), we consider additional sentinel loss. 
+* Cross entropy loss is used to train the model.
+* Sentinel Loss (SL): Following from work by (Merity et al., 2016), we consider additional sentinel loss.
     * This loss function can be considered as a form of *supervised attention*.
 * We lowercase sentences and then use NLTK’s PUNKT tokenizer to tokenize all sentences.
 
 #### Evaluation
-* Our primary evaluation metric is *BLEU* (Papineni et al., 2002) . We compute *BLEU* using the freely available and very widely used perl script7 from the MOSES decoder. 
-* We also report *PINC* 
+* Our primary evaluation metric is *BLEU* (Papineni et al., 2002) . We compute *BLEU* using the freely available and very widely used perl script7 from the MOSES decoder.
+* We also report *PINC*
 
 #### Implementation
 * We use a minibatch-size of 32 and the *ADAM* optimizer (Kingma and Ba, 2014) with learning rate 0.001, momentum parameters 0.9 and 0.999, and ε = 10−8. All our implementations are written in Python using Tensorflow 1.1.0 framework.
@@ -150,13 +150,13 @@
 * We introduce a new simplification dataset that is a significant improvement over _Simple Wikipedia_, and present a novel quantitative-comparative approach to study the quality of simplification data resources.
 
 
-* The __Parallel Wikipedia Simplification (PWKP)__ corpus prepared by Zhu et al. (2010), has become the benchmark dataset for training and evaluating automatic text simplification systems. However, we will show that this dataset is deficient and should be considered obsolete. 
-    1) It is prone to automatic sentence alignment errors; 
-    2) It contains a large proportion of inadequate simplifications; 
+* The __Parallel Wikipedia Simplification (PWKP)__ corpus prepared by Zhu et al. (2010), has become the benchmark dataset for training and evaluating automatic text simplification systems. However, we will show that this dataset is deficient and should be considered obsolete.
+    1) It is prone to automatic sentence alignment errors;
+    2) It contains a large proportion of inadequate simplifications;
     3) It generalizes poorly to other text genres.
     
 #### Newsela
-* Newsela: Each article has been re-written 4 times for children at different grade levels by editors at Newsela2, a company that produces reading materials for pre-college classroom use. 
+* Newsela: Each article has been re-written 4 times for children at different grade levels by editors at Newsela2, a company that produces reading materials for pre-college classroom use.
 * We use Simp-4 to denote the most simplified level and Simp-1 to denote the least simplified level.
 * It is motivated by the Common Core Standards (Porter et al., 2011) in the United States. All the Newsela articles are grounded in the _Lexile3 readability score_, which is widely used to measure text complexity and assess students’ reading ability
 
@@ -178,7 +178,7 @@
 * Collected 1M tweets from celebrities and high profile accounts, cut down to 10 accounts with strong authorship style
 
 #### Architecture
-* Architecture - RNN GRU to find content latent variable, one layer FF NN to be discriminator, duplicate encoder to act as decoder to learn content representation. 
+* Architecture - RNN GRU to find content latent variable, one layer FF NN to be discriminator, duplicate encoder to act as decoder to learn content representation.
 * Then optimize decoder to output target style.
 
 #### Evaluation
@@ -193,17 +193,17 @@
 
 #### Method
 * Frames style transfer as denois-ing: we synthesize a noisy corpus and treat the source style as a noisy version of the target style.
-    * Start with non-parallel data in different styles 
-    * Then synthesize parallel data using backtranslation 
+    * Start with non-parallel data in different styles
+    * Then synthesize parallel data using backtranslation
     * Produce noise in a way that should mimic the styles of the opposite text
     
 #### Use in parallelized text
 * With the parallel corpus, train a denoising NN between noisy and clean data - prepend each sentence with a token denoting its style. Train the model using both sets of noised / clean data - target and source styles.
-* Use a transformer encoder-decoder with byte-pair encoding. 
+* Use a transformer encoder-decoder with byte-pair encoding.
 
 #### Evaluation
-* Evaluation: We define transfer strength as the ratio of target-domain to source-domain shift in sentence probability. 
-    * Content - use cosine similarity. 
+* Evaluation: We define transfer strength as the ratio of target-domain to source-domain shift in sentence probability.
+    * Content - use cosine similarity.
     * Fluency - We use the average log probability of the sentence post-transfer with respect to a language model trained on CommonCrawl as our measure of fluency.
     
 #### Conclusion
@@ -212,3 +212,23 @@
 
 
 
+## New Papers / Code on VAE and Transformers
+
+* Github with list of papers / code: https://github.com/forrestbing/Style-Transfer-in-Text
+* Unsupervised Controllable Text Formalization
+    * Code: https://github.com/parajain/uctf
+    * Paper: https://arxiv.org/pdf/1809.04556.pdf
+    * This paper uses pre-trained models and packages like spacy, has good evaluation metrics, and the datasets we can leverage
+* Style Transformer: Unpaired Text Style Transfer withoutDisentangled Latent Representation
+    * Code: https://github.com/fastnlp/style-transformer
+    * Paper: https://arxiv.org/pdf/1905.05621.pdf
+    * This paper uses transformers - I think it would be a good one to implement
+* A Transformer-Based Variational Autoencoder forSentence Generation
+    * Another transformer paper:https://ieeexplore.ieee.org/stamp/stamp.jsp?tp=&arnumber=8852155&tag=1
+* Adversarially Regularized Autoencoders
+    * Another latent variable model, seen cited on other papers. Implemented in pytorch with good eval functions in the utils.py file
+    * Code: https://github.com/jakezhaojb/ARAE
+    * Paper: https://arxiv.org/pdf/1706.04223.pdf
+* Unsupervised Evaluation Metrics and Learning Criteria for Non-Parallel Textual Transfer
+    * this paper is all about the eval metrics - some overlap with others
+    * Paper: https://arxiv.org/pdf/1810.11878.pdf
